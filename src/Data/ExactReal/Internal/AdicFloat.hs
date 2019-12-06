@@ -41,6 +41,10 @@ afDiv :: AdicFloat -> AdicFloat -> AdicFloat
 afDiv (e, m) b = afDiv' (e+1, 0:m) (afNorm b)
 afDiv' (e1, m1) (e2, m2) = (e1 - e2, asDiv m1 m2)
 
+afIntDiv :: AdicFloat -> Integer -> AdicFloat
+afIntDiv _ 0 = undefined
+afIntDiv (e, m) n = (e, asIntDiv m n)
+
 afIntPow :: AdicFloat -> Integer -> AdicFloat
 afIntPow _ 0 = afOne
 afIntPow x 1 = x
