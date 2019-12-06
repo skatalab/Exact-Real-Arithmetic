@@ -21,5 +21,5 @@ instance Num ExactReal where
 
 instance Fractional ExactReal where
     (ER x) / (ER y) = ER $ afDiv x y
-    fromRational n = ER $ afDiv (decintAf . show $ numerator n) (decintAf . show $ denominator n)
+    fromRational n = ER $ afIntDiv (decintAf . show $ numerator n) (denominator n)
 
