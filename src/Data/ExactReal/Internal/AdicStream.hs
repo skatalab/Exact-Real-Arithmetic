@@ -100,7 +100,7 @@ asIntDiv x n = asIntDiv' x n 0
 asIntDiv' :: AdicStream -> Integer -> Integer -> AdicStream
 asIntDiv' (x:xs) n s = p : asIntDiv' xs n (s' - n * p)
     where
-        p = x `quot` n
+        p = s' `quot` n
         s' = s * adic + x
 
 
