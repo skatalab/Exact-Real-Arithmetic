@@ -15,11 +15,11 @@ instance Num ExactReal where
     (ER x) - (ER y) = ER $ afSub x y
     (ER x) * (ER y) = ER $ afMul x y
     negate (ER x) = ER $ afNegate x
-    fromInteger i = ER $ decAf $ show i
+    fromInteger i = ER $ decintAf $ show i
     abs (ER x) = undefined
     signum (ER x) = undefined
 
 instance Fractional ExactReal where
     (ER x) / (ER y) = ER $ afDiv x y
-    fromRational n = ER $ afDiv (decAf . show $ numerator n) (decAf . show $ denominator n)
+    fromRational n = ER $ afDiv (decintAf . show $ numerator n) (decintAf . show $ denominator n)
 
