@@ -1,7 +1,8 @@
-module Data.AdicStream where
+module Data.ExactReal.Internal.AdicStream where
 
 import Data.Int
 import Data.Char
+import Data.Bits
 import Debug.Trace
 
 type AdicDigit = Integer
@@ -12,7 +13,7 @@ type AdicStream = [AdicDigit]
 
 adic :: AdicDigit
 -- adic = 10
-adic = 2 ^ 31
+adic = 2 ^ 32
 
 asZero :: AdicStream
 asZero = 0 : asZero
@@ -53,9 +54,11 @@ asSub a b = asAdd a $ asNegate b
 
 asDigitMulNonCarry :: AdicStream -> AdicDigit -> AdicStream
 asDigitMulNonCarry (x:xs) n = (n * x) `rem` adic : asDigitMulNonCarry xs n
+-- asDigitMulNonCarry (x:xs) n = (0xffffffff .&. fromIntegral (n * x)) : asDigitMulNonCarry xs n
 
 asDigitMulCarry :: AdicStream -> AdicDigit -> AdicStream
 asDigitMulCarry (x:xs) n = (n * x) `quot` adic : asDigitMulCarry xs n
+-- asDigitMulCarry (x:xs) n = fromIntegral (n * x) `shiftR` 32 : asDigitMulCarry xs n
 
 asDigitMul :: AdicStream -> AdicDigit -> AdicStream
 asDigitMul xs y = asAdd a b
@@ -79,7 +82,8 @@ asMul' xs (y:ys) hoge = let c:cs = asAdd hoge (0:asDigitMul xs y) in c : asMul' 
 asDiv' :: AdicStream -> AdicStream -> AdicStream
 asDiv' a@(x1:x2:x3:xs) b@(y1:y2:ys) = p : asDiv' zs b
     where
-        p = round $ fromIntegral (x1 * adic * adic + x2 * adic + x3) / fromIntegral (y1 * adic + y2)
+        -- p = round $ fromIntegral (x1 * adic * adic + x2 * adic + x3) / fromIntegral (y1 * adic + y2)
+        p = (x1 * adic * adic + x2 * adic + x3) `quot` (y1 * adic + y2)
         _:zs = p0 $ asSub a (asDigitMul b p)
 
 asDiv :: AdicStream -> AdicStream -> AdicStream

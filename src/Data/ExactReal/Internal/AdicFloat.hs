@@ -1,8 +1,8 @@
-module Data.AdicFloat where
+module Data.ExactReal.Internal.AdicFloat where
 
 import Data.Int
 import Data.Char
-import Data.AdicStream
+import Data.ExactReal.Internal.AdicStream
 
 type AdicFloat = (Integer, AdicStream) -- (exponential, mantissa)
 
