@@ -61,6 +61,7 @@ asDigitMulCarry (x:xs) n = (n * x) `quot` adic : asDigitMulCarry xs n
 -- asDigitMulCarry (x:xs) n = fromIntegral (n * x) `shiftR` 32 : asDigitMulCarry xs n
 
 asDigitMul :: AdicStream -> AdicDigit -> AdicStream
+asDigitMul _ 0 = asZero
 asDigitMul xs y = asAdd a b
     where
         a = asDigitMulCarry xs y
