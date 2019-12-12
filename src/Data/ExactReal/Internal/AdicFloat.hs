@@ -1,6 +1,6 @@
 module Data.ExactReal.Internal.AdicFloat where
 
-import Data.Int
+import Data.Ratio
 import Data.Char
 import Data.ExactReal.Internal.AdicStream
 
@@ -67,6 +67,21 @@ afNormWithZero a = a
 
 
 ---------- for debug ----------
+
+asDec2 :: Integer -> AdicStream -> Rational
+asDec2 _ [] = 0
+asDec2 i (x:xs) = x % (adic ^ i) + asDec2 (i+1) xs
+
+afDec2_int :: Integer -> AdicStream -> Rational
+afDec2_int 0 (x:_) = fromInteger x
+afDec2_int e (x:xs) = fromInteger (x * adic ^ e) + afDec2_int (e-1) xs
+
+afDec2' :: Int -> AdicFloat -> Rational
+afDec2' n (e, m) | e <= 0    = (asDec2 1 (take n m)) / fromInteger (adic ^ (-e))
+                 | otherwise = afDec2_int (e-1) m + afDec2' n (0, drop (fromInteger e) m)
+
+afDec2 :: Int -> AdicFloat -> String
+afDec2 n a = show $ fromRational $ afDec2' n $ afNormWithZero a
 
 afDec' :: Int -> AdicFloat -> Double
 afDec' n (e, a@(x:xs)) | e <= 0    = fromIntegral adic ^^ e * (asDec' 1 $ take n a)

@@ -8,7 +8,7 @@ import Data.Ratio (numerator, denominator)
 newtype ExactReal = ER AdicFloat
 
 instance Show ExactReal where
-    show (ER x) = afDec 2 x
+    show (ER x) = afDec2 2 x
 
 instance Num ExactReal where
     (ER x) + (ER y) = ER $ afAdd x y
