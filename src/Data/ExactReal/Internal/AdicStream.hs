@@ -69,7 +69,8 @@ asDigitMul xs y = asAdd a b
 
 asMul :: AdicStream -> AdicStream -> AdicStream
 asMul xs (y:ys) = asMul' xs ys (asDigitMul xs y)
-asMul' xs (y:ys) hoge = let c:cs = asAdd hoge (0:asDigitMul xs y) in c : asMul' xs ys cs
+asMul' xs (y:ys) hoge = c : asMul' xs ys cs
+    where c:cs = asAdd hoge (0:asDigitMul xs y)
 
 -- asDigitDiv' :: AdicStream -> AdicDigit -> AdicStream
 -- asDigitDiv' (x1:x2:xs) y = x1 `quot` y : asDigitDiv' nexts y
@@ -81,16 +82,15 @@ asMul' xs (y:ys) hoge = let c:cs = asAdd hoge (0:asDigitMul xs y) in c : asMul' 
 --         where xss = (x1 * adic + x2) : xs
 
 asDiv' :: AdicStream -> AdicStream -> AdicStream
-asDiv' a@(x1:x2:x3:xs) b@(y1:y2:ys) = p : asDiv' zs b
+asDiv' a@(x1:x2:_) b@(y1:_) = p : asDiv' zs b
     where
-        -- p = round $ fromIntegral (x1 * adic * adic + x2 * adic + x3) / fromIntegral (y1 * adic + y2)
-        p = (x1 * adic * adic + x2 * adic + x3) `quot` (y1 * adic + y2)
-        _:zs = p0 $ asSub a (asDigitMul b p)
+        p = (x1 * adic + x2) `quot` y1
+        zs = p0tail $ asSub a (asDigitMul b p)
 
 asDiv :: AdicStream -> AdicStream -> AdicStream
-asDiv (0:xs) (0:ys) = asDiv xs ys
-asDiv _ (0:0:_) = undefined
-asDiv a b = asDiv' a b
+asDiv xs ys
+    | p0able xs && p0able ys = asDiv (p0tail xs) (p0tail ys)
+    | otherwise = asDiv' xs ys
 
 asIntDiv :: AdicStream -> Integer -> AdicStream
 asIntDiv x 0 = undefined
@@ -128,6 +128,20 @@ p0 (-1:0:xs) = 0 : (-adic + 1) : rest
 p0 (-1:x2:xs) | 0 < x2 = 0:(x2 - adic) : xs
 -- p0 _ = undefined
 p0 x = trace ("panic! x = " ++ (show $ take 10 x)) undefined
+
+-- tail . p0
+p0tail :: AdicStream -> AdicStream
+p0tail (0:xs) = xs
+p0tail (x:xs) = push x xs
+
+push :: AdicDigit -> AdicStream -> AdicStream
+push d (x:xs)
+    | abs d' < adic = d' : xs
+    | otherwise = (d' - d) : push d xs
+    where d' = d * adic + x
+
+p0able :: AdicStream -> Bool
+p0able (x1:x2:_) = abs (x1 * adic + x2) < adic
 
 one_plus_negx :: AdicStream -> AdicStream
 one_plus_negx (x:xs) | 0 < x  = undefined
