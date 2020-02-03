@@ -81,7 +81,8 @@ afDec2' n (e, m) | e <= 0    = (asDec2 1 (take n m)) / fromInteger (adic ^ (-e))
                  | otherwise = afDec2_int (e-1) m + afDec2' n (0, drop (fromInteger e) m)
 
 afDec2 :: Int -> AdicFloat -> String
-afDec2 n a = show $ fromRational $ afDec2' n $ afNormWithZero a
+-- afDec2 n a = show $ fromRational $ afDec2' n $ afNormWithZero a
+afDec2 n a = display n $ afDec2' (req4adic2ten n) $ afNormWithZero a
 
 afDec' :: Int -> AdicFloat -> Double
 afDec' n (e, a@(x:xs)) | e <= 0    = fromIntegral adic ^^ e * (asDec' 1 $ take n a)
@@ -111,3 +112,17 @@ decAf ('-':x) = afNegate $ afAdd (decintAf x') (0, decAs' y')
     where (x', y') = splitComma x
 decAf      x  = afAdd (decintAf x') (0, decAs' y')
     where (x', y') = splitComma x
+
+req4adic2ten :: Int -> Int
+req4adic2ten d = ceiling $ (fromIntegral d) * (logBase 2 10) / 32
+
+display :: Int -> Rational -> String
+display len rat = (if num < 0 then "-" else "") ++ (shows d ("." ++ take len (go next)))
+    where
+        (d, next) = abs num `quotRem` den
+        num = numerator rat
+        den = denominator rat
+
+        go 0 = ""
+        go x = let (d, next) = (10 * x) `quotRem` den
+               in shows d (go next)
